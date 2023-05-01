@@ -4,6 +4,8 @@
 Author: Matteo Bottacini, matteo.bottacini@usi.ch
 Last update: March 4, 2021
 """
+## GBM is a mathematical model used to describe the evolution of an asset price over time.
+## Monte-Carlo simulation is a statistic technique used to simulate the behaviour of a system over time.
 
 # import modules
 import pandas as pd
@@ -24,9 +26,12 @@ pred_end_date = '2020-12-31'
 scen_size = 10000
 
 # download and prepare data
+## Download daily adjusted closing of a given stock using the Yahoo Finance (yf) API.
+## Remember it is adjusted, would it be better if not adjusted?
 prices = yf.download(tickers=stock_name, start=start_date, end=pred_end_date)['Adj Close']
 train_set = prices.loc[:end_date]
 test_set = prices.loc[end_date:pred_end_date]
+## Calculates the daily returns of the training set using the closing prices.
 daily_returns = ((train_set / train_set.shift(1)) - 1)[1:]
 
 # Geometric Brownian Motion (GBM)
@@ -45,12 +50,16 @@ daily_returns = ((train_set / train_set.shift(1)) - 1)[1:]
 
 
 # Parameter Assignments
+## The last available price in the training set is taken as the initial stock price for the simulation.
 So = train_set[-1]
+## The time step for the simulation is set to 1 day.
 dt = 1  # day   # User input
+## The number of weekdays between the end date of the training set and the predicted end date.
 n_of_wkdays = pd.date_range(start=pd.to_datetime(end_date,
                                                  format="%Y-%m-%d") + pd.Timedelta('1 days'),
                             end=pd.to_datetime(pred_end_date,
                                                format="%Y-%m-%d")).to_series().map(lambda x: 1 if x.isoweekday() in range(1, 6) else 0).sum()
+## The total time period for the simulation.
 T = n_of_wkdays
 N = T / dt
 t = np.arange(1, int(N) + 1)
