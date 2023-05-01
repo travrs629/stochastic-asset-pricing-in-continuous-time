@@ -52,10 +52,8 @@ daily_returns = ((train_set / train_set.shift(1)) - 1)[1:]
 # Parameter Assignments
 ## The last available price in the training set is taken as the initial stock price for the simulation.
 So = train_set[-1]
-
 ## The time step for the simulation is set to 1 day.
 dt = 1  # day   # User input
-
 ## The number of weekdays between the end date of the training set and the predicted end date.
 ## Calculated using date_range() function to generate a series of data, then using map() and lambda() to check if it is weekdays.
 ## sum() function is used to count the number of weekdays in total.
@@ -64,23 +62,18 @@ n_of_wkdays = pd.date_range(start=pd.to_datetime(end_date,
                             end=pd.to_datetime(pred_end_date,
                                                format="%Y-%m-%d")).to_series().map(lambda x: 1 if x.isoweekday() in range(1, 6) else 0).sum()
 T = n_of_wkdays
-
 ## Total number of time steps for the simulation (using T/dt).
 N = T / dt
-
-## 
+## An array of integers representing the time steps from 1 to 'N'.
 t = np.arange(1, int(N) + 1)
-
-
+## The mean daily return of the stock, calculated using the mean() function.
 mu = np.mean(daily_returns)
-
-
+## The standard deviation of the daily returns of the stock, calculated using std() funciton.
 sigma = np.std(daily_returns)
-
-
+## A dictionary of random numbers generated using the normal distribution with a meano f 0 and a standard deviation of 1.
+## It has scen_size numbers of scenarios, each with 'N' number of random numbers.
 b = {str(scen): np.random.normal(0, 1, int(N)) for scen in range(1, scen_size + 1)}
-
-
+## A dictionary of cumulative sums of the random numbers in 'b' for each scenario.
 W = {str(scen): b[str(scen)].cumsum() for scen in range(1, scen_size + 1)}
 
 
