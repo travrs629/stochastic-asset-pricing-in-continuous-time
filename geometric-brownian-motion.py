@@ -78,10 +78,13 @@ W = {str(scen): b[str(scen)].cumsum() for scen in range(1, scen_size + 1)}
 
 
 # Calculating drift and diffusion components
+## The drift component represents the expected change in the stock price over time.
 drift = (mu - 0.5 * sigma ** 2) * t
+## The diffusion component represents the random, unpredictable fluctuations in the stock price.
 diffusion = {str(scen): sigma * W[str(scen)] for scen in range(1, scen_size + 1)}
 
 # Making the predictions
+## The stock price simulations are made using the formula below.
 S = np.array([So * np.exp(drift + diffusion[str(scen)]) for scen in range(1, scen_size + 1)])
 S = np.hstack((np.array([[So] for scen in range(scen_size)]), S))  # add So to the beginning series
 S_max = [S[:, i].max() for i in range(0, int(N))]
